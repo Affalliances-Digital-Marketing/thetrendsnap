@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-title" content="TheTrendSnap" />
+    <meta name="application-name" content="TheTrendSnap" />
+    <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b1120" media="(prefers-color-scheme: dark)" />
+    <title>TheTrendSnap — What Comes Next</title>
+    <meta
+      name="description"
+      content="TheTrendSnap brings you the latest news, reviews, guides and trends that matter."
+    />
+
+    <!--
+      The share card and the logo travel with every link to the site, so a
+      result in search, a post on social and a message preview all show the
+      brand rather than a blank placeholder. Routes override the title, the
+      description and the image; these are the defaults behind them.
+    -->
+    <link rel="canonical" href="https://thetrendsnap.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="TheTrendSnap" />
+    <meta property="og:title" content="TheTrendSnap — What Comes Next" />
+    <meta
+      property="og:description"
+      content="TheTrendSnap brings you the latest news, reviews, guides and trends that matter."
+    />
+    <meta property="og:url" content="https://thetrendsnap.com/" />
+    <meta property="og:image" content="https://thetrendsnap.com/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="TheTrendSnap — what comes next" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TheTrendSnap — What Comes Next" />
+    <meta
+      name="twitter:description"
+      content="TheTrendSnap brings you the latest news, reviews, guides and trends that matter."
+    />
+    <meta name="twitter:image" content="https://thetrendsnap.com/og-image.jpg" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "TheTrendSnap",
+        "url": "https://thetrendsnap.com/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://thetrendsnap.com/icon-512.png",
+          "width": 512,
+          "height": 512
+        },
+        "image": "https://thetrendsnap.com/og-image.jpg",
+        "slogan": "What comes next"
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      // Applied before paint so the first frame is never the wrong theme.
+      (function () {
+        try {
+          // ?theme=dark|light lets us share (and screenshot) either palette.
+          var forced = new URLSearchParams(location.search).get("theme");
+          if (forced === "dark" || forced === "light") {
+            localStorage.setItem("tts-theme", forced);
+          }
+          var stored = localStorage.getItem("tts-theme");
+          var dark =
+            stored === "dark" ||
+            (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches);
+          if (dark) document.documentElement.classList.add("dark");
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
