@@ -7,6 +7,28 @@ import { useAds } from "@/hooks/useContent";
 import { useDevice } from "@/hooks/useMediaQuery";
 import { cn } from "@/lib/utils";
 
+/**
+ * A route change in a single-page app never reloads the page, so Analytics
+ * would only ever see the first one. Each route reports itself instead, after
+ * the page has set its own title (a page's own effect runs before this one).
+ */
+function PageViews() {
+  const { pathname, search } = useLocation();
+
+  useEffect(() => {
+    const gtag = (window as unknown as { gtag?: (...args: unknown[]) => void }).gtag;
+    if (typeof gtag !== "function") return;
+
+    gtag("event", "page_view", {
+      page_path: pathname + search,
+      page_location: window.location.href,
+      page_title: document.title,
+    });
+  }, [pathname, search]);
+
+  return null;
+}
+
 function ScrollToTop() {
   const { pathname, hash } = useLocation();
 
@@ -30,6 +52,7 @@ export function Layout() {
   return (
     <div className="flex min-h-screen flex-col bg-white dark:bg-[#0b1120]">
       <ScrollToTop />
+      <PageViews />
 
       <a
         href="#main"

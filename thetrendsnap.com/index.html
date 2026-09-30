@@ -85,6 +85,21 @@
         } catch (e) {}
       })();
     </script>
+
+    <!--
+      Google Analytics 4. The site is a single-page app, so the tag itself does
+      not count a view on a route change; `send_page_view: false` leaves that
+      to the app, which reports every route once its title is set.
+    -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZFRLE4Z2JZ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+      gtag("config", "G-ZFRLE4Z2JZ", { send_page_view: false });
+    </script>
   </head>
   <body>
     <div id="root"></div>
