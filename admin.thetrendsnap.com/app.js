@@ -3,6 +3,10 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const compression = require("compression");
 
+// Registered before the route files pull in their models: the query ceiling is
+// a global plugin, and a plugin reaches only the schemas compiled after it.
+require("./config/queryTimeout");
+
 const app = express();
 const errorHandler = require("./middlewares/error.middleware");
 
@@ -87,6 +91,34 @@ app.use("/api", (req, res, next) => {
     success: false,
     message: "Database unavailable — the API is reconnecting. Please retry shortly.",
   });
+});
+
+/**
+ * Reports what the API can actually do with the database right now: whether a
+ * ping gets through, and whether an ordinary read returns. The two come apart
+ * exactly when the site looks broken while the process looks healthy, and this
+ * says so in one request instead of needing the server's logs.
+ */
+app.get("/api/health/db", async (req, res) => {
+  const timed = async (label, run) => {
+    const started = Date.now();
+    try {
+      const value = await run();
+      return { [label]: "ok", [`${label}Ms`]: Date.now() - started, ...(value || {}) };
+    } catch (err) {
+      return { [label]: "failed", [`${label}Ms`]: Date.now() - started, [`${label}Error`]: err.message };
+    }
+  };
+
+  const state = DB_STATE[mongoose.connection.readyState] || "unknown";
+  const ping = await timed("ping", () => mongoose.connection.db.admin().ping());
+  const read = await timed("read", async () => ({
+    categories: await mongoose.connection
+      .collection("categories")
+      .countDocuments({}, { maxTimeMS: 15000 }),
+  }));
+
+  res.json({ db: state, host: mongoose.connection.host, name: mongoose.connection.name, ...ping, ...read });
 });
 
 /* ---- existing ---- */
