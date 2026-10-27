@@ -61,9 +61,33 @@ app.use(express.urlencoded({ extended: true, limit: "25mb" }));
    ROUTES
 ========================= */
 
-app.get("/api/health", (req, res) =>
-  res.json({ status: "ok", uptime: process.uptime() })
-);
+const mongoose = require("mongoose");
+
+/** Named so the health check reads as a status rather than as a number. */
+const DB_STATE = ["disconnected", "connected", "connecting", "disconnecting"];
+
+// Answers 200 whenever the process is alive — the deployment's own health
+// gate reads this — and names the database's state so a degraded API can be
+// told apart from a dead one at a glance.
+app.get("/api/health", (req, res) => {
+  const db = DB_STATE[mongoose.connection.readyState] || "unknown";
+  res.json({ status: db === "connected" ? "ok" : "degraded", db, uptime: process.uptime() });
+});
+
+/**
+ * Every route below reads the database. While the connection is down those
+ * queries used to sit in the driver's buffer until the proxy gave up a minute
+ * later, and the browser saw a 504 with no CORS headers — which reads as "the
+ * site is broken" with nothing in the logs to say why. Answer immediately
+ * instead, with a status a caller can act on.
+ */
+app.use("/api", (req, res, next) => {
+  if (mongoose.connection.readyState === 1 || req.path === "/health") return next();
+  return res.status(503).json({
+    success: false,
+    message: "Database unavailable — the API is reconnecting. Please retry shortly.",
+  });
+});
 
 /* ---- existing ---- */
 app.use("/api/auth", require("./routes/auth.routes"));
