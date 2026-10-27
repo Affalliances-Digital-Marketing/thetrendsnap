@@ -24,6 +24,7 @@ import { ShareBar } from "@/components/article/ShareBar";
 import { ReadingProgress } from "@/components/article/ReadingProgress";
 import { TableOfContents, useHeadings } from "@/components/article/TableOfContents";
 import { Lightbox } from "@/components/article/Lightbox";
+import { FeaturedImage } from "@/components/article/FeaturedImage";
 import { AdSlot } from "@/components/ads/AdSlot";
 import { ArticleAd } from "@/components/ads/ArticleAd";
 import { SmartImage } from "@/components/ui/SmartImage";
@@ -312,62 +313,64 @@ export default function ArticlePage() {
         {/* ---------------- main grid ---------------- */}
         <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
           <article className="min-w-0 lg:col-span-8">
-            {image && (
-              <figure className="overflow-hidden rounded-2xl border border-ink-200 dark:border-ink-800">
-                {(() => {
-                  const picture = (
-                    <SmartImage
-                      src={image}
-                      alt={imageAlt(article.featuredImage, article.title)}
-                      ratio="aspect-[16/9]"
-                      rounded="rounded-none"
-                      width={1400}
-                      priority
-                      imgClassName={
-                        featuredLink ? "transition-transform duration-500 group-hover:scale-[1.02]" : undefined
-                      }
-                    />
-                  );
+            {image && (() => {
+              const caption = (article.featuredImage?.caption ||
+                article.featuredImage?.credit) && (
+                <figcaption className="flex flex-wrap items-center justify-between gap-2 bg-ink-50 px-4 py-2 text-xs text-ink-500 dark:bg-ink-800/60 dark:text-ink-400">
+                  <span>{article.featuredImage?.caption}</span>
+                  {article.featuredImage?.credit && (
+                    <span className="italic">© {article.featuredImage.credit}</span>
+                  )}
+                </figcaption>
+              );
 
-                  // The editor's redirect link for the main image, set in the
-                  // article editor or the import sheet. Without one the image
-                  // stays a picture, not a dead link.
-                  if (!featuredLink) return picture;
+              const picture = (
+                <FeaturedImage
+                  src={image}
+                  alt={imageAlt(article.featuredImage, article.title)}
+                  image={article.featuredImage}
+                  priority
+                  className={featuredLink ? "border-0" : undefined}
+                  imgClassName={
+                    featuredLink ? "transition-transform duration-500 group-hover:scale-[1.02]" : undefined
+                  }
+                >
+                  {!featuredLink && caption}
+                </FeaturedImage>
+              );
 
-                  const newTab = article.featuredImage?.openInNewTab !== false;
-                  const rel = [
-                    newTab ? "noopener noreferrer" : "",
-                    article.featuredImage?.nofollow !== false ? "nofollow" : "",
-                  ]
-                    .filter(Boolean)
-                    .join(" ");
+              // The editor's redirect link for the main image, set in the
+              // article editor or the import sheet. Without one the image
+              // stays a picture, not a dead link.
+              if (!featuredLink) return picture;
 
-                  return (
-                    <a
-                      href={featuredLink}
-                      target={newTab ? "_blank" : undefined}
-                      rel={rel || undefined}
-                      className="group relative block cursor-pointer"
-                      aria-label={`${imageAlt(article.featuredImage, article.title)} — opens link`}
-                    >
-                      {picture}
-                      <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-xs font-semibold text-white opacity-0 ring-1 ring-inset ring-white/20 backdrop-blur-md transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-                        Open link
-                        <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                      </span>
-                    </a>
-                  );
-                })()}
-                {(article.featuredImage?.caption || article.featuredImage?.credit) && (
-                  <figcaption className="flex flex-wrap items-center justify-between gap-2 bg-ink-50 px-4 py-2 text-xs text-ink-500 dark:bg-ink-800/60 dark:text-ink-400">
-                    <span>{article.featuredImage?.caption}</span>
-                    {article.featuredImage?.credit && (
-                      <span className="italic">© {article.featuredImage.credit}</span>
-                    )}
-                  </figcaption>
-                )}
-              </figure>
-            )}
+              const newTab = article.featuredImage?.openInNewTab !== false;
+              const rel = [
+                newTab ? "noopener noreferrer" : "",
+                article.featuredImage?.nofollow !== false ? "nofollow" : "",
+              ]
+                .filter(Boolean)
+                .join(" ");
+
+              return (
+                <figure className="mx-auto w-fit overflow-hidden rounded-2xl border border-ink-200 dark:border-ink-800">
+                  <a
+                    href={featuredLink}
+                    target={newTab ? "_blank" : undefined}
+                    rel={rel || undefined}
+                    className="group relative block cursor-pointer"
+                    aria-label={`${imageAlt(article.featuredImage, article.title)} — opens link`}
+                  >
+                    {picture}
+                    <span className="pointer-events-none absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/55 px-2.5 py-1 text-xs font-semibold text-white opacity-0 ring-1 ring-inset ring-white/20 backdrop-blur-md transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                      Open link
+                      <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                    </span>
+                  </a>
+                  {caption}
+                </figure>
+              );
+            })()}
 
             {/* summary card — always filled, so the column never starts thin */}
             {excerptOf(article, 260) && (
