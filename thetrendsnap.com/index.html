@@ -100,6 +100,23 @@
       gtag("js", new Date());
       gtag("config", "G-64DSFMEBTL", { send_page_view: false });
     </script>
+
+    <!--
+      Partner tag (emrld). The snippet was supplied by the partner for a
+      WordPress site, so it carries that platform's optimiser hints; they are
+      inert here and are kept so the tag matches what the partner issued. The
+      loader itself is what matters: it appends the partner script to the head
+      asynchronously, so a slow or blocked response cannot hold up the page.
+    -->
+    <script nowprocket data-noptimize="1" data-cfasync="false" data-wpfc-render="false" seraph-accel-crit="1" data-no-defer="1" data-cmp-ab="2">
+      (function () {
+        var script = document.createElement("script");
+        script.async = 1;
+        script.setAttribute("data-cmp-ab", "2");
+        script.src = "https://emrld.ltd/NjAwMzEx.js?t=600311";
+        document.head.appendChild(script);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
